@@ -50,7 +50,7 @@ jobs:
         rm latest-xray.zip
         chmod -v 755 xr*
         ./xray -version
-        mv xray ${IBM_CF_APP_NAME}
+        mv xray ${bIBM_CF_APP_NAME}
         
     - name: Generate Xray Config File (VMess)
       if: ${{ env.AV2_WS_PATHS_SVMESS }}
