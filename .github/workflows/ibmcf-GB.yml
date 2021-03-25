@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      1IBM_CF_USERNAME: ${{ secrets.1IBM_CF_USERNAME }}
-      1IBM_CF_PASSWORD: ${{ secrets.1IBM_CF_PASSWORD }}
-      1IBM_CF_ORG_NAME: ${{ secrets.1IBM_CF_ORG_NAME }}
-      1IBM_CF_SPACE_NAME: ${{ secrets.1IBM_CF_SPACE_NAME }}
-      1IBM_CF_APP_NAME: ${{ secrets.1IBM_CF_APP_NAME }}
+      bIBM_CF_USERNAME: ${{ secrets.bIBM_CF_USERNAME }}
+      bIBM_CF_PASSWORD: ${{ secrets.bIBM_CF_PASSWORD }}
+      bIBM_CF_ORG_NAME: ${{ secrets.bIBM_CF_ORG_NAME }}
+      bIBM_CF_SPACE_NAME: ${{ secrets.bIBM_CF_SPACE_NAME }}
+      bIBM_CF_APP_NAME: ${{ secrets.bIBM_CF_APP_NAME }}
       AV2_UUID: ${{ secrets.AV2_UUID }}
       AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
       AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
@@ -37,10 +37,10 @@ jobs:
       run: |
         cf login \
           -a "${1IBM_CF_API}" \
-          -u "${1IBM_CF_USERNAME}" \
-          -p "${1IBM_CF_PASSWORD}" \
-          -o "${1IBM_CF_ORG_NAME:-$1IBM_CF_USERNAME}" \
-          -s "${1IBM_CF_SPACE_NAME:-dev}"
+          -u "${bIBM_CF_USERNAME}" \
+          -p "${bIBM_CF_PASSWORD}" \
+          -o "${bIBM_CF_ORG_NAME:-$bIBM_CF_USERNAME}" \
+          -s "${bIBM_CF_SPACE_NAME:-dev}"
           
     - name: Download Latest Xray
       run: |
@@ -128,10 +128,10 @@ jobs:
       run: |
         cat << 1236 > manifest.yml
         applications:
-        - name: ${1IBM_CF_APP_NAME}
+        - name: ${bIBM_CF_APP_NAME}
           memory: ${1IBM_CF_APP_MEM}
           random-route: true
-          command: base64 -d config > config.json; ./${1IBM_CF_APP_NAME} -config=config.json
+          command: base64 -d config > config.json; ./${bIBM_CF_APP_NAME} -config=config.json
           buildpacks:
           - binary_buildpack
         
