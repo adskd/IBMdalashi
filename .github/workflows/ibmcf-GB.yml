@@ -14,7 +14,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     env:
       bIBM_CF_USERNAME: ${{ secrets.bIBM_CF_USERNAME }}
       bIBM_CF_PASSWORD: ${{ secrets.bIBM_CF_PASSWORD }}
@@ -22,8 +22,8 @@ jobs:
       bIBM_CF_SPACE_NAME: ${{ secrets.bIBM_CF_SPACE_NAME }}
       bIBM_CF_APP_NAME: ${{ secrets.bIBM_CF_APP_NAME }}
       AV2_UUID: ${{ secrets.AV2_UUID }}
-     # AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
-     # AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
+    #  AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
+    #  AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
 
     steps:
 
@@ -53,9 +53,9 @@ jobs:
         mv xray ${bIBM_CF_APP_NAME}
         
     - name: Generate Xray Config File (VMess)
-     # if: ${{ env.AV2_WS_PATHS_SVMESS }}
+    #  if: ${{ env.AV2_WS_PATHS_SVMESS }}
       run: |
-        base64 << 1236 > config
+        base64 << 126 > config
         {
           "log": {
             "access": "none",
@@ -76,7 +76,7 @@ jobs:
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-                #  "path": "${AV2_WS_PATHS_SVMESS}"
+                  "path": "${AV2_WS_PATHS_SVMESS}"
                 }
               }
             }
@@ -89,9 +89,9 @@ jobs:
         }
         
     - name: Generate Xray Config File (VLESS)
-   #   if: ${{ env.AV2_WSA_PATHS_AVLESS }}
+    #  if: ${{ env.AV2_WSA_PATHS_AVLESS }}
       run: |
-        base64 << 1236 > config
+        base64 << 126 > config
         {
           "log": {
             "access": "none",
@@ -105,14 +105,14 @@ jobs:
                 "decryption": "none",
                 "clients": [
                   {
-                    "id": "${V2_UUID}"
+                    "id": "${AV2_UUID}"
                   }
                 ]
               },
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-               #   "path": "${AV2_WSA_PATHS_AVLESS}"
+                  "path": "${AV2_WSA_PATHS_AVLESS}"
                 }
               }
             }
@@ -126,7 +126,7 @@ jobs:
         
     - name: Generate Manifest File
       run: |
-        cat << 1236 > manifest.yml
+        cat << 126 > manifest.yml
         applications:
         - name: ${bIBM_CF_APP_NAME}
           memory: ${bIBM_CF_APP_MEM}
