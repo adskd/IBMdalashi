@@ -2,8 +2,8 @@
 name: aIBM Cloud Foundry - aV2Ray
 
 env:
-  1IBM_CF_API: https://api.us-south.cf.cloud.ibm.com
-  1IBM_CF_APP_MEM: 256M
+  bIBM_CF_API: https://api.us-south.cf.cloud.ibm.com
+  bIBM_CF_APP_MEM: 256M
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
     - name: Login to IBM Cloud Foundry
       run: |
         cf login \
-          -a "${1IBM_CF_API}" \
+          -a "${bIBM_CF_API}" \
           -u "${bIBM_CF_USERNAME}" \
           -p "${bIBM_CF_PASSWORD}" \
           -o "${bIBM_CF_ORG_NAME:-$bIBM_CF_USERNAME}" \
@@ -129,7 +129,7 @@ jobs:
         cat << 1236 > manifest.yml
         applications:
         - name: ${bIBM_CF_APP_NAME}
-          memory: ${1IBM_CF_APP_MEM}
+          memory: ${bIBM_CF_APP_MEM}
           random-route: true
           command: base64 -d config > config.json; ./${bIBM_CF_APP_NAME} -config=config.json
           buildpacks:
