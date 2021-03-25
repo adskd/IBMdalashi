@@ -22,8 +22,8 @@ jobs:
       bIBM_CF_SPACE_NAME: ${{ secrets.bIBM_CF_SPACE_NAME }}
       bIBM_CF_APP_NAME: ${{ secrets.bIBM_CF_APP_NAME }}
       AV2_UUID: ${{ secrets.AV2_UUID }}
-      AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
-      AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
+     # AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
+     # AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
 
     steps:
 
@@ -53,7 +53,7 @@ jobs:
         mv xray ${bIBM_CF_APP_NAME}
         
     - name: Generate Xray Config File (VMess)
-      if: ${{ env.AV2_WS_PATHS_SVMESS }}
+     # if: ${{ env.AV2_WS_PATHS_SVMESS }}
       run: |
         base64 << 1236 > config
         {
@@ -76,7 +76,7 @@ jobs:
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-                  "path": "${AV2_WS_PATHS_SVMESS}"
+                #  "path": "${AV2_WS_PATHS_SVMESS}"
                 }
               }
             }
@@ -89,7 +89,7 @@ jobs:
         }
         
     - name: Generate Xray Config File (VLESS)
-      if: ${{ env.AV2_WSA_PATHS_AVLESS }}
+   #   if: ${{ env.AV2_WSA_PATHS_AVLESS }}
       run: |
         base64 << 1236 > config
         {
@@ -112,7 +112,7 @@ jobs:
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-                  "path": "${AV2_WSA_PATHS_AVLESS}"
+               #   "path": "${AV2_WSA_PATHS_AVLESS}"
                 }
               }
             }
