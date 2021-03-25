@@ -1,29 +1,29 @@
 
-name: IBM Cloud Foundry - V2Ray
+name: aIBM Cloud Foundry - aV2Ray
 
 env:
-  IBM_CF_API: https://api.eu-gb.cf.cloud.ibm.com
-  IBM_CF_APP_MEM: 64M
+  1IBM_CF_API: https://api.us-south.cf.cloud.ibm.com
+  1IBM_CF_APP_MEM: 256M
 
 on:
   workflow_dispatch:
   repository_dispatch:
   schedule:
-    - cron: 0 20 * * *
+    - cron: 10 17 * * 3
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      IBM_CF_USERNAME: ${{ secrets.IBM_CF_USERNAME }}
-      IBM_CF_PASSWORD: ${{ secrets.IBM_CF_PASSWORD }}
-      IBM_CF_ORG_NAME: ${{ secrets.IBM_CF_ORG_NAME }}
-      IBM_CF_SPACE_NAME: ${{ secrets.IBM_CF_SPACE_NAME }}
-      IBM_CF_APP_NAME: ${{ secrets.IBM_CF_APP_NAME }}
-      V2_UUID: ${{ secrets.V2_UUID }}
-      V2_WS_PATH_VMESS: ${{ secrets.V2_WS_PATH_VMESS }}
-      V2_WS_PATH_VLESS: ${{ secrets.V2_WS_PATH_VLESS }}
+      1IBM_CF_USERNAME: ${{ secrets.1IBM_CF_USERNAME }}
+      1IBM_CF_PASSWORD: ${{ secrets.1IBM_CF_PASSWORD }}
+      1IBM_CF_ORG_NAME: ${{ secrets.1IBM_CF_ORG_NAME }}
+      1IBM_CF_SPACE_NAME: ${{ secrets.1IBM_CF_SPACE_NAME }}
+      1IBM_CF_APP_NAME: ${{ secrets.1IBM_CF_APP_NAME }}
+      AV2_UUID: ${{ secrets.AV2_UUID }}
+      AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
+      AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
 
     steps:
 
@@ -32,16 +32,14 @@ jobs:
         curl -fsSL "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github" | tar -zxC /tmp
         sudo install -m 755 /tmp/cf7 /usr/local/bin/cf
         cf version
-
     - name: Login to IBM Cloud Foundry
       run: |
         cf login \
-          -a "${IBM_CF_API}" \
-          -u "${IBM_CF_USERNAME}" \
-          -p "${IBM_CF_PASSWORD}" \
-          -o "${IBM_CF_ORG_NAME:-$IBM_CF_USERNAME}" \
-          -s "${IBM_CF_SPACE_NAME:-dev}"
-
+          -a "${1IBM_CF_API}" \
+          -u "${1IBM_CF_USERNAME}" \
+          -p "${1IBM_CF_PASSWORD}" \
+          -o "${1IBM_CF_ORG_NAME:-$1IBM_CF_USERNAME}" \
+          -s "${1IBM_CF_SPACE_NAME:-dev}"
     - name: Download Latest V2Ray
       run: |
         DOWNLOAD_URL="https://github.com/v2fly/v2ray-core/releases/latest/download/v2ray-linux-64.zip"
@@ -50,12 +48,11 @@ jobs:
         rm latest-v2ray.zip
         chmod -v 755 v2*
         ./v2ray -version
-        mv v2ray ${IBM_CF_APP_NAME}
-
+        mv v2ray ${1IBM_CF_APP_NAME}
     - name: Generate V2Ray Config File (VMess)
-      if: ${{ env.V2_WS_PATH_VMESS }}
+      if: ${{ env.AV2_WS_PATHS_SVMESS }}
       run: |
-        base64 << 123 > config
+        base64 << 1236 > config
         {
           "log": {
             "access": "none",
@@ -63,20 +60,20 @@ jobs:
           },
           "inbounds": [
             {
-              "port": 8080,
+              "port": 8082,
               "protocol": "vmess",
               "settings": {
                 "clients": [
                   {
-                    "id": "${V2_UUID}",
-                    "alterId": 64
+                    "id": "${AV2_UUID}",
+                    "alterId": 2
                   }
                 ]
               },
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-                  "path": "${V2_WS_PATH_VMESS}"
+                  "path": "${AV2_WS_PATHS_SVMESS}"
                 }
               }
             }
@@ -88,11 +85,10 @@ jobs:
           ]
         }
         
-
     - name: Generate V2Ray Config File (VLESS)
-      if: ${{ env.V2_WS_PATH_VLESS }}
+      if: ${{ env.AV2_WSA_PATHS_AVLESS }}
       run: |
-        base64 << 123 > config
+        base64 << 1236 > config
         {
           "log": {
             "access": "none",
@@ -100,20 +96,20 @@ jobs:
           },
           "inbounds": [
             {
-              "port": 8080,
+              "port": 8082,
               "protocol": "vless",
               "settings": {
-                "decryption": "none",
                 "clients": [
                   {
-                    "id": "${V2_UUID}"
+                    "id": "${AV2_UUID}"
                   }
-                ]
+                ],
+				 "decryption": "none"
               },
               "streamSettings": {
                 "network":"ws",
                 "wsSettings": {
-                  "path": "${V2_WS_PATH_VLESS}"
+                  "path": "${AV2_WSA_PATHS_AVLESS}"
                 }
               }
             }
@@ -125,18 +121,16 @@ jobs:
           ]
         }
         
-
     - name: Generate Manifest File
       run: |
-        cat << 123 > manifest.yml
+        cat << 1236 > manifest.yml
         applications:
-        - name: ${IBM_CF_APP_NAME}
-          memory: ${IBM_CF_APP_MEM}
+        - name: ${1IBM_CF_APP_NAME}
+          memory: ${1IBM_CF_APP_MEM}
           random-route: true
-          command: base64 -d config > config.json; ./${IBM_CF_APP_NAME} -config=config.json
+          command: base64 -d config > config.json; ./${1IBM_CF_APP_NAME} -config=config.json
           buildpacks:
           - binary_buildpack
         
-
     - name: Deploy Cloud Foundry App
       run: cf push
