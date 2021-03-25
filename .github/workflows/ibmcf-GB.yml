@@ -32,6 +32,7 @@ jobs:
         curl -fsSL "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github" | tar -zxC /tmp
         sudo install -m 755 /tmp/cf7 /usr/local/bin/cf
         cf version
+        
     - name: Login to IBM Cloud Foundry
       run: |
         cf login \
@@ -40,16 +41,18 @@ jobs:
           -p "${1IBM_CF_PASSWORD}" \
           -o "${1IBM_CF_ORG_NAME:-$1IBM_CF_USERNAME}" \
           -s "${1IBM_CF_SPACE_NAME:-dev}"
-    - name: Download Latest V2Ray
+          
+    - name: Download Latest Xray
       run: |
-        DOWNLOAD_URL="https://github.com/v2fly/v2ray-core/releases/latest/download/v2ray-linux-64.zip"
-        curl -fsSL "$DOWNLOAD_URL" -o "latest-v2ray.zip"
-        unzip latest-v2ray.zip v2ray v2ctl geoip.dat geosite.dat
-        rm latest-v2ray.zip
-        chmod -v 755 v2*
-        ./v2ray -version
-        mv v2ray ${1IBM_CF_APP_NAME}
-    - name: Generate V2Ray Config File (VMess)
+        DOWNLOAD_URL="https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip"
+        curl -fsSL "$DOWNLOAD_URL" -o "latest-xray.zip"
+        unzip latest-xray.zip xray geoip.dat geosite.dat
+        rm latest-xray.zip
+        chmod -v 755 xr*
+        ./xray -version
+        mv xray ${IBM_CF_APP_NAME}
+        
+    - name: Generate Xray Config File (VMess)
       if: ${{ env.AV2_WS_PATHS_SVMESS }}
       run: |
         base64 << 1236 > config
@@ -85,7 +88,7 @@ jobs:
           ]
         }
         
-    - name: Generate V2Ray Config File (VLESS)
+    - name: Generate Xray Config File (VLESS)
       if: ${{ env.AV2_WSA_PATHS_AVLESS }}
       run: |
         base64 << 1236 > config
@@ -99,12 +102,12 @@ jobs:
               "port": 8082,
               "protocol": "vless",
               "settings": {
+                "decryption": "none",
                 "clients": [
                   {
-                    "id": "${AV2_UUID}"
+                    "id": "${V2_UUID}"
                   }
-                ],
-				 "decryption": "none"
+                ]
               },
               "streamSettings": {
                 "network":"ws",
