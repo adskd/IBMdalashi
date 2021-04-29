@@ -1,9 +1,10 @@
 
+
 name: aIBM Cloud Foundry - aV2Ray
 
 env:
   bIBM_CF_API: https://api.us-south.cf.cloud.ibm.com
-  bIBM_CF_APP_MEM: 256M
+  bIBM_CF_APP_MEM: 64M
 
 on:
   workflow_dispatch:
@@ -23,7 +24,7 @@ jobs:
       bIBM_CF_APP_NAME: ${{ secrets.bIBM_CF_APP_NAME }}
       AV2_UUID: ${{ secrets.AV2_UUID }}
     #  AV2_WS_PATHS_SVMESS: ${{ secrets.AV2_WS_PATHS_SVMESS }}
-    #  AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
+      AV2_WSA_PATHS_AVLESS: ${{ secrets.AV2_WSA_PATHS_AVLESS }}
 
     steps:
 
@@ -33,7 +34,7 @@ jobs:
         sudo install -m 755 /tmp/cf7 /usr/local/bin/cf
         cf version
         
-    - name: Login to IBM Cloud Foundry
+    - name: Login to aIBM Cloud Foundry
       run: |
         cf login \
           -a "${bIBM_CF_API}" \
@@ -55,7 +56,7 @@ jobs:
     - name: Generate Xray Config File (VMess)
     #  if: ${{ env.AV2_WS_PATHS_SVMESS }}
       run: |
-        base64 << 126 > config
+        base64 << 126 > cconfig
         {
           "log": {
             "access": "none",
@@ -91,7 +92,7 @@ jobs:
     - name: Generate Xray Config File (VLESS)
     #  if: ${{ env.AV2_WSA_PATHS_AVLESS }}
       run: |
-        base64 << 126 > config
+        base64 << 126 > cconfig
         {
           "log": {
             "access": "none",
@@ -105,7 +106,8 @@ jobs:
                 "decryption": "none",
                 "clients": [
                   {
-                    "id": "${AV2_UUID}"
+                    "id": "${AV2_UUID}",
+                    "level": 0
                   }
                 ]
               },
@@ -131,9 +133,15 @@ jobs:
         - name: ${bIBM_CF_APP_NAME}
           memory: ${bIBM_CF_APP_MEM}
           random-route: true
-          command: base64 -d config > config.json; ./${bIBM_CF_APP_NAME} -config=config.json
+          command: base64 -d config > cconfig.json; ./${bIBM_CF_APP_NAME} -config=cconfig.json
           buildpacks:
           - binary_buildpack
         
     - name: Deploy Cloud Foundry App
       run: cf push
+      
+      
+      
+      
+      
+      
